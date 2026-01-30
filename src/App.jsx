@@ -10,11 +10,15 @@ function App() {
   const [songs, setSongs] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [apiKey, setApiKey] = useState(import.meta.env.VITE_GEMINI_API_KEY || '');
+
+  // Always read fresh from env
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const youtubeKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+
   const [currentVideo, setCurrentVideo] = useState(null);
   const [playing, setPlaying] = useState(false);
 
-  const youtubeKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+
 
   const playSong = async (song) => {
     if (!youtubeKey || youtubeKey.includes('your_youtube_api_key')) {
