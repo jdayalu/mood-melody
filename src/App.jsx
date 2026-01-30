@@ -23,13 +23,13 @@ function App() {
 
 
   const playSong = async (song) => {
+    // If no API key configured, fallback immediately
     if (!youtubeKey || youtubeKey.includes('your_youtube_api_key')) {
-      alert("Please add VITE_YOUTUBE_API_KEY to your .env file to play music!");
+      window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
       return;
     }
 
     setPlaying(true);
-    // Optimistic UI or loading state could go here if needed
 
     try {
       const query = `${song.title} ${song.artist} official audio`;
@@ -37,22 +37,25 @@ function App() {
       const data = await response.json();
 
       if (data.error) {
-        console.error("YouTube API Error Details:", data.error);
-        alert(`YouTube Error: ${data.error.message}`);
+        console.warn("YouTube API Error (likely quota). Falling back to external link.", data.error);
         setPlaying(false);
+        // Fallback: Open in new tab
+        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
         return;
       }
 
       if (data.items && data.items.length > 0) {
         setCurrentVideo(data.items[0].id.videoId);
       } else {
-        alert("Song not found on YouTube.");
         setPlaying(false);
+        // Fallback: Open in new tab
+        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
       }
     } catch (err) {
       console.error("YouTube Search Error:", err);
-      alert("Failed to connect to YouTube. Please check your internet connection.");
       setPlaying(false);
+      // Fallback: Open in new tab
+      window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
     }
   };
 
@@ -77,7 +80,7 @@ function App() {
       // Switching to 'lite' version to attempt to bypass quota/availability issues
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
-      const prompt = `Recommend 5 ${language} songs for someone who is feeling "${mood}". 
+      const prompt = `Recommend 10 ${language} songs for someone who is feeling "${mood}". 
       Prefer songs that fit the era/age description: "${era}".
       Return the response as a JSON array where each object has "title", "artist", a brief "reason" for the recommendation, and a "history" field containing a 1-2 sentence interesting fact or history about the song in ${language} language.
       Do not include markdown or code blocks, just the raw JSON string. e.g. [{"title": "...", "artist": "...", "reason": "...", "history": "..."}]`;
@@ -112,6 +115,7 @@ function App() {
           <Music className="logo-icon" />
           <h1>SariGama</h1>
         </div>
+        <p className="creation-credit">A Dayalu Creation</p>
         <p className="subtitle">Discover the perfect soundtrack for your feelings</p>
       </header>
 
