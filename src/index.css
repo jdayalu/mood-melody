@@ -3,10 +3,10 @@
   --bg-secondary: #1e293b;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --accent-primary: #8b5cf6;
+  --accent-primary: #5cf669;
   --accent-secondary: #06b6d4;
   --accent-glow: rgba(139, 92, 246, 0.5);
-  
+
   --font-family: 'Outfit', sans-serif;
 }
 
@@ -35,13 +35,16 @@ body {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary); 
+  background: var(--bg-primary);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-secondary); 
+  background: var(--bg-secondary);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary); 
+  background: var(--text-secondary);
 }

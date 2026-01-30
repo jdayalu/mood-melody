@@ -107,7 +107,28 @@ function App() {
 
       <main className="main-content">
         <div className="input-section">
-
+          <div className="mood-select-container">
+            {[
+              { label: 'Cheerful', mood: 'Cheerful' },
+              { label: 'Energy', mood: 'Energetic' },
+              { label: 'Calm', mood: 'Calm' },
+              { label: 'Melancholic', mood: 'Melancholic' },
+              { label: 'Nostalgic', mood: 'Nostalgic' },
+              { label: 'Love', mood: 'Romantic and Lovely' },
+            ].map((item) => (
+              <button
+                key={item.label}
+                onClick={() => {
+                  setMood(item.mood);
+                  // Optional: auto-search when clicked
+                  // getRecommendations(); 
+                }}
+                className={`mood-chip ${mood === item.mood ? 'selected' : ''}`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
 
           <div className="mood-input-wrapper">
             <input
