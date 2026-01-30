@@ -8,6 +8,7 @@ import './PlayButton.css';
 function App() {
   const [mood, setMood] = useState('Nostalgic');
   const [language, setLanguage] = useState('Malayalam');
+  const [era, setEra] = useState('Old');
   const [songs, setSongs] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -70,6 +71,7 @@ function App() {
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
       const prompt = `Recommend 5 ${language} songs for someone who is feeling "${mood}". 
+      Prefer songs that fit the era/age description: "${era}".
       Return the response as a JSON array where each object has "title", "artist", a brief "reason" for the recommendation, and a "history" field containing a 1-2 sentence interesting fact or history about the song in ${language} language.
       Do not include markdown or code blocks, just the raw JSON string. e.g. [{"title": "...", "artist": "...", "reason": "...", "history": "..."}]`;
 
@@ -117,6 +119,19 @@ function App() {
                 style={{ borderRadius: '0.5rem', flex: 1, textAlign: 'center', justifyContent: 'center' }}
               >
                 {lang}
+              </button>
+            ))}
+          </div>
+
+          <div className="mood-select-container">
+            {['Oldest', 'Older', 'Old', 'New', 'Newer', 'Newest'].map((item) => (
+              <button
+                key={item}
+                onClick={() => setEra(item)}
+                className={`mood-chip ${era === item ? 'selected' : ''}`}
+                style={{ borderRadius: '0.5rem', flex: 1, textAlign: 'center', justifyContent: 'center', fontSize: '0.8rem', padding: '0.4rem' }}
+              >
+                {item}
               </button>
             ))}
           </div>
