@@ -103,7 +103,7 @@ function App() {
       <header className="header">
         <div className="logo">
           <Music className="logo-icon" />
-          <h1>MoodMelody</h1>
+          <h1>SariGama</h1>
         </div>
         <p className="subtitle">Discover the perfect soundtrack for your feelings</p>
       </header>
