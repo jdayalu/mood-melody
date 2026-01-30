@@ -102,22 +102,7 @@ function App() {
 
       <main className="main-content">
         <div className="input-section">
-          {!import.meta.env.VITE_GEMINI_API_KEY && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              className="api-key-container"
-            >
-              <input
-                type="password"
-                id="api-key-input"
-                placeholder="Enter Gemini API Key (or set in .env)"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="glass-input small"
-              />
-            </motion.div>
-          )}
+
 
           <div className="mood-input-wrapper">
             <input
