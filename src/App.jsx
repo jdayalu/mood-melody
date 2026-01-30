@@ -65,8 +65,8 @@ function App() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      // 'gemini-1.5-flash' usually has better free tier limits (15 RPM) than the very newest 'latest' alias
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // Switching to 'lite' version to attempt to bypass quota/availability issues
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
       const prompt = `Recommend 5 malayalam songs for someone who is feeling "${mood}". 
       Return the response as a JSON array where each object has "title", "artist", a brief "reason" for the recommendation, and a "history" field containing a 1-2 sentence interesting fact or history about the song in Malayalam language.
