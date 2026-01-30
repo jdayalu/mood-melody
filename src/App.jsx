@@ -36,6 +36,13 @@ function App() {
       const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&key=${youtubeKey}`);
       const data = await response.json();
 
+      if (data.error) {
+        console.error("YouTube API Error Details:", data.error);
+        alert(`YouTube Error: ${data.error.message}`);
+        setPlaying(false);
+        return;
+      }
+
       if (data.items && data.items.length > 0) {
         setCurrentVideo(data.items[0].id.videoId);
       } else {
@@ -44,7 +51,7 @@ function App() {
       }
     } catch (err) {
       console.error("YouTube Search Error:", err);
-      alert("Failed to load song from YouTube.");
+      alert("Failed to connect to YouTube. Please check your internet connection.");
       setPlaying(false);
     }
   };
