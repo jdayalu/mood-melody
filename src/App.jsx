@@ -6,7 +6,7 @@ import './App.css';
 import './PlayButton.css';
 
 function App() {
-  const [mood, setMood] = useState('');
+  const [mood, setMood] = useState('Nostalgic');
   const [language, setLanguage] = useState('Malayalam');
   const [songs, setSongs] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -109,7 +109,7 @@ function App() {
       <main className="main-content">
         <div className="input-section">
           <div className="mood-select-container">
-            {['Malayalam', 'Tamil', 'Hindi', 'English'].map((lang) => (
+            {['Malayalam', 'Tamil', 'Hindi', 'Telgu', 'Spanish', 'English'].map((lang) => (
               <button
                 key={lang}
                 onClick={() => setLanguage(lang)}

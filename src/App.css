@@ -116,14 +116,15 @@ h1 {
 }
 
 .mood-chip {
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.3);
   padding: 0.5rem 1rem;
   border-radius: 2rem;
-  color: var(--text-secondary);
+  color: #e2e8f0;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .mood-chip:hover {
