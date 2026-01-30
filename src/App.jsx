@@ -67,9 +67,9 @@ function App() {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
-      const prompt = `Recommend 5 malayalamsongs for someone who is feeling "${mood}". 
-      Return the response as a JSON array where each object has "title", "artist", and a brief "reason" for the recommendation. 
-      Do not include markdown or code blocks, just the raw JSON string. e.g. [{"title": "...", "artist": "...", "reason": "..."}]`;
+      const prompt = `Recommend 5 malayalam songs for someone who is feeling "${mood}". 
+      Return the response as a JSON array where each object has "title", "artist", a brief "reason" for the recommendation, and a "history" field containing a 1-2 sentence interesting fact or history about the song in Malayalam language.
+      Do not include markdown or code blocks, just the raw JSON string. e.g. [{"title": "...", "artist": "...", "reason": "...", "history": "..."}]`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -164,7 +164,13 @@ function App() {
                     <Play size={20} fill="currentColor" />
                   </button>
                 </div>
+
                 <p className="reason">{song.reason}</p>
+                {song.history && (
+                  <p className="history-text">
+                    <span className="history-label">ചിന്താവിഷയം:</span> {song.history}
+                  </p>
+                )}
               </motion.div>
             ))}
           </AnimatePresence>
@@ -207,7 +213,7 @@ function App() {
       <footer className="footer">
         <p>Powered by Google Gemini</p>
       </footer>
-    </div>
+    </div >
   );
 }
 

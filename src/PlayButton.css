@@ -92,3 +92,24 @@
         margin-bottom: 2rem;
     }
 }
+
+.history-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-top: 0.75rem;
+    border-left: 2px solid var(--accent-secondary);
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.history-label {
+    font-weight: 700;
+    color: var(--accent-secondary);
+    font-style: normal;
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
