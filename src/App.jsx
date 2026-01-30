@@ -47,14 +47,15 @@ function App() {
       if (data.items && data.items.length > 0) {
         setCurrentVideo(data.items[0].id.videoId);
       } else {
+        // Fallback if empty results
+        console.warn("No video found, opening fallback.");
         setPlaying(false);
-        // Fallback: Open in new tab
         window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
       }
     } catch (err) {
+      // Fallback on network/other error
       console.error("YouTube Search Error:", err);
       setPlaying(false);
-      // Fallback: Open in new tab
       window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
     }
   };
