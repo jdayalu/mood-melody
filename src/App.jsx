@@ -375,7 +375,7 @@ function App() {
                       id="audio-iframe-player"
                       width="100%"
                       height="100%"
-                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&origin=${window.location.origin}`}
+                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&playsinline=1&origin=${window.location.origin}`}
                       title="YouTube audio player"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -384,6 +384,7 @@ function App() {
                         if (window.YT && window.YT.Player) {
                           new window.YT.Player(e.target, {
                             events: {
+                              'onReady': (event) => event.target.playVideo(),
                               'onStateChange': handlePlayerStateChange
                             }
                           });
@@ -423,7 +424,7 @@ function App() {
                       id="existing-iframe-player"
                       width="100%"
                       height="100%"
-                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&origin=${window.location.origin}`}
+                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&playsinline=1&origin=${window.location.origin}`}
                       title="YouTube video player"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -432,6 +433,7 @@ function App() {
                         if (window.YT && window.YT.Player) {
                           new window.YT.Player(e.target, {
                             events: {
+                              'onReady': (event) => event.target.playVideo(),
                               'onStateChange': handlePlayerStateChange
                             }
                           });
