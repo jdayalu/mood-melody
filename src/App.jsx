@@ -335,7 +335,7 @@ function App() {
             ))}
           </AnimatePresence>
         </section>
-      </main>
+      </main >
 
       <AnimatePresence>
         {playing && currentVideo && (
@@ -356,6 +356,13 @@ function App() {
                     {songs && currentSongIndex !== -1 ? songs[currentSongIndex].artist : ''}
                   </span>
                 </div>
+
+                {/* Lyrics Preview in Audio Bar */}
+                <div className="lyrics-preview-bar">
+                  {songs && currentSongIndex !== -1 && songs[currentSongIndex].lyricsSnippet ?
+                    `"${songs[currentSongIndex].lyricsSnippet}"` : '🎵 Audio Mode Active'}
+                </div>
+
                 <div className="audio-controls">
                   <button className="close-audio-btn" onClick={closePlayer}>
                     <X size={24} />
@@ -402,10 +409,16 @@ function App() {
                   className="player-modal"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button className="close-btn" onClick={closePlayer}>
-                    <X size={24} />
-                  </button>
-                  <div id="youtube-player" style={{ width: '100%', height: '100%' }}>
+                  <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'white' }}>
+                      {songs && currentSongIndex !== -1 ? songs[currentSongIndex].title : 'Now Playing'}
+                    </h3>
+                    <button className="close-btn" onClick={closePlayer} style={{ position: 'static' }}>
+                      <X size={24} />
+                    </button>
+                  </div>
+
+                  <div id="youtube-player" style={{ width: '100%', aspectRatio: '16/9', borderRadius: '12px', overflow: 'hidden' }}>
                     <iframe
                       id="existing-iframe-player"
                       width="100%"
@@ -426,6 +439,17 @@ function App() {
                       }}
                     ></iframe>
                   </div>
+
+                  {/* Lyrics Display in Modal */}
+                  {songs && currentSongIndex !== -1 && songs[currentSongIndex].lyricsSnippet && (
+                    <div className="modal-lyrics" style={{ marginTop: '1.5rem', textAlign: 'center', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+                      <p style={{ color: 'var(--accent-secondary)', fontWeight: 'bold', marginBottom: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem' }}>Lyrics Snippet</p>
+                      <p style={{ fontStyle: 'italic', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                        "{songs[currentSongIndex].lyricsSnippet}"
+                      </p>
+                    </div>
+                  )}
+
                 </motion.div>
               </motion.div>
             )}
