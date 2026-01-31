@@ -8,7 +8,7 @@ import './PlayButton.css';
 function App() {
   const [mood, setMood] = useState('Nostalgic');
   const [language, setLanguage] = useState('Malayalam');
-  const [era, setEra] = useState('Old');
+
   const [songs, setSongs] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -194,18 +194,7 @@ function App() {
             ))}
           </div>
 
-          <div className="mood-select-container">
-            {['Oldest', 'Older', 'Old', 'New', 'Newer', 'Newest'].map((item) => (
-              <button
-                key={item}
-                onClick={() => setEra(item)}
-                className={`mood-chip ${era === item ? 'selected' : ''}`}
-                style={{ borderRadius: '0.5rem', flex: 1, textAlign: 'center', justifyContent: 'center', fontSize: '0.8rem', padding: '0.4rem' }}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
+
 
           <div className="mood-select-container">
             {[
