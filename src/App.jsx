@@ -154,6 +154,11 @@ function App() {
 
       try {
         const data = JSON.parse(text);
+        // Double check: Shuffle on client side to guarantee randomness
+        for (let i = data.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [data[i], data[j]] = [data[j], data[i]];
+        }
         setSongs(data);
       } catch (e) {
         console.error("Failed to parse JSON", e);
