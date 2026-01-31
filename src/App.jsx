@@ -81,10 +81,32 @@ function App() {
       // Switching to 'lite' version to attempt to bypass quota/availability issues
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
-      const prompt = `Recommend 10 ${language} songs for someone who is feeling "${mood}". 
-      Prefer songs that fit the era/age description: "${era}".
-      Return the response as a JSON array where each object has "title", "artist", a brief "reason" for the recommendation, and a "history" field containing a 1-2 sentence interesting fact or history about the song in ${language} language.
-      Do not include markdown or code blocks, just the raw JSON string. e.g. [{"title": "...", "artist": "...", "reason": "...", "history": "..."}]`;
+      const prompt = `
+      You are an expert musicologist and cultural historian specializing in ${language} music.
+      Your task is to curate a highly specific playlist of 10 songs for a listener who is feeling "${mood}".
+      The selection must strictly adhere to the era/age description: "${era}".
+
+      ### Selection Criteria:
+      1. **Mood Matching:** Analyze the lyrics, tempo, key, and instrumentation. Ensure the emotional resonance matches "${mood}" precisely (e.g., if sad, choose minor keys/slower tempos; if energetic, choose upbeat/major keys).
+      2. **Era Accuracy:** Strictly filter for songs released or popular during the "${era}" period.
+      3. **Language:** All songs must be sung in ${language}.
+
+      ### Output Requirements:
+      - Return ONLY a raw JSON array.
+      - STRICTLY NO markdown formatting (no \`\`\`json blocks), no conversational text, and no whitespace padding.
+      - Ensure all strings are properly escaped to prevent JSON parsing errors.
+
+      ### JSON Structure:
+      Return an array of objects. Each object must follow this schema:
+      [
+        {
+          "title": "Song Title",
+          "artist": "Artist Name",
+          "reason": "A brief, 1-sentence explanation of why this song fits the '${mood}' mood.",
+          "history": "A 1-2 sentence interesting historical fact or cultural context about the song, written strictly in ${language}."
+        }
+      ]
+      `;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
