@@ -14,6 +14,7 @@ function App() {
   const [error, setError] = useState('');
   const [currentSongIndex, setCurrentSongIndex] = useState(-1);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [audioOnly, setAudioOnly] = useState(false);
 
   // Always read fresh from env
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -263,7 +264,7 @@ function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="action-bar"
-              style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}
+              style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}
             >
               <button
                 onClick={startAutoPlay}
@@ -272,6 +273,18 @@ function App() {
               >
                 <Play size={16} fill="white" />
                 Play All
+              </button>
+
+              <button
+                onClick={() => setAudioOnly(!audioOnly)}
+                className={`generate-btn ${audioOnly ? 'active' : ''}`}
+                style={{
+                  background: audioOnly ? 'var(--accent-primary)' : 'rgba(30, 41, 59, 0.7)',
+                  width: 'auto',
+                  border: audioOnly ? 'none' : '1px solid rgba(148, 163, 184, 0.3)'
+                }}
+              >
+                <span>{audioOnly ? '🎵 Audio Mode' : '📺 Video Mode'}</span>
               </button>
             </motion.div>
           )}
@@ -316,47 +329,97 @@ function App() {
 
       <AnimatePresence>
         {playing && currentVideo && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="player-overlay"
-            onClick={closePlayer}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="player-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button className="close-btn" onClick={closePlayer}>
-                <X size={24} />
-              </button>
-              <div id="youtube-player" style={{ width: '100%', height: '100%' }}>
-                {/* This div will be replaced by the YouTube IFrame API */}
-                <iframe
-                  id="existing-iframe-player"
-                  width="100%"
-                  height="100%"
-                  src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&origin=${window.location.origin}`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  onLoad={(e) => {
-                    if (window.YT && window.YT.Player) {
-                      new window.YT.Player(e.target, {
-                        events: {
-                          'onStateChange': handlePlayerStateChange
+          <>
+            {/* Audio Only Mode Bar */}
+            {audioOnly ? (
+              <motion.div
+                initial={{ y: 100 }}
+                animate={{ y: 0 }}
+                exit={{ y: 100 }}
+                className="audio-only-bar"
+              >
+                <div className="now-playing-info">
+                  <span className="now-playing-title">
+                    {songs && currentSongIndex !== -1 ? songs[currentSongIndex].title : 'Playing...'}
+                  </span>
+                  <span className="now-playing-artist">
+                    {songs && currentSongIndex !== -1 ? songs[currentSongIndex].artist : ''}
+                  </span>
+                </div>
+                <div className="audio-controls">
+                  <button className="close-audio-btn" onClick={closePlayer}>
+                    <X size={24} />
+                  </button>
+                </div>
+                {/* Invisible YouTube Player */}
+                <div style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+                  <div id="youtube-player-audio">
+                    <iframe
+                      id="audio-iframe-player"
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&origin=${window.location.origin}`}
+                      title="YouTube audio player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      onLoad={(e) => {
+                        if (window.YT && window.YT.Player) {
+                          new window.YT.Player(e.target, {
+                            events: {
+                              'onStateChange': handlePlayerStateChange
+                            }
+                          });
                         }
-                      });
-                    }
-                  }}
-                ></iframe>
-              </div>
-            </motion.div>
-          </motion.div>
+                      }}
+                    ></iframe>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              /* Regular Video Modal */
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="player-overlay"
+                onClick={closePlayer}
+              >
+                <motion.div
+                  initial={{ scale: 0.9, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.9, y: 20 }}
+                  className="player-modal"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button className="close-btn" onClick={closePlayer}>
+                    <X size={24} />
+                  </button>
+                  <div id="youtube-player" style={{ width: '100%', height: '100%' }}>
+                    <iframe
+                      id="existing-iframe-player"
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&origin=${window.location.origin}`}
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      onLoad={(e) => {
+                        if (window.YT && window.YT.Player) {
+                          new window.YT.Player(e.target, {
+                            events: {
+                              'onStateChange': handlePlayerStateChange
+                            }
+                          });
+                        }
+                      }}
+                    ></iframe>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </>
         )}
       </AnimatePresence>
 
