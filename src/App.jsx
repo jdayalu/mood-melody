@@ -141,7 +141,8 @@ function App() {
           "title": "Song Title",
           "artist": "Artist Name",
           "reason": "A brief, 1-sentence explanation of why this song fits the '${mood}' mood.",
-          "history": "A 1-2 sentence interesting historical fact or cultural context about the song, written strictly in ${language}."
+          "history": "A 1-2 sentence interesting historical fact or cultural context about the song, written strictly in ${language}.",
+          "lyricsSnippet": "A famous 2-4 line excerpt or chorus from the song lyrics (in original language)."
         }
       ]
       `;
@@ -320,6 +321,15 @@ function App() {
                   <p className="history-text">
                     <span className="history-label">ചിന്താവിഷയം:</span> {song.history}
                   </p>
+                )}
+
+                {song.lyricsSnippet && (
+                  <div className="lyrics-container" style={{ marginTop: '0.5rem', borderTop: '1px dashed rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                      <span style={{ color: 'var(--accent-primary)', fontWeight: 'bold', marginRight: '5px' }}>🎵 Lyrics:</span>
+                      "{song.lyricsSnippet}"
+                    </p>
+                  </div>
                 )}
               </motion.div>
             ))}
