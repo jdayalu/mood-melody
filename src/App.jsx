@@ -12,6 +12,8 @@ function App() {
   const [songs, setSongs] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [currentSongIndex, setCurrentSongIndex] = useState(-1);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
 
   // Always read fresh from env
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -22,7 +24,17 @@ function App() {
 
 
 
-  const playSong = async (song) => {
+  // Load YouTube IFrame API
+  useState(() => {
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+  }, []);
+
+  const playSong = async (song, index = -1) => {
     // If no API key configured, fallback immediately
     if (!youtubeKey || youtubeKey.includes('your_youtube_api_key')) {
       window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
@@ -30,6 +42,7 @@ function App() {
     }
 
     setPlaying(true);
+    if (index !== -1) setCurrentSongIndex(index);
 
     try {
       const query = `${song.title} ${song.artist} official audio`;
@@ -60,9 +73,32 @@ function App() {
     }
   };
 
+
+
   const closePlayer = () => {
     setPlaying(false);
     setCurrentVideo(null);
+    setIsAutoPlaying(false);
+    setCurrentSongIndex(-1);
+  };
+
+  const handlePlayerStateChange = (event) => {
+    // 0 = ENDED
+    if (event.data === 0 && isAutoPlaying && songs && currentSongIndex !== -1 && currentSongIndex < songs.length - 1) {
+      const nextIndex = currentSongIndex + 1;
+      playSong(songs[nextIndex], nextIndex);
+    }
+  };
+
+  const startAutoPlay = () => {
+    if (songs && songs.length > 0) {
+      setIsAutoPlaying(true);
+      playSong(songs[0], 0);
+    }
+  };
+
+  const onPlayerReady = (event) => {
+    event.target.playVideo();
   };
 
   const getRecommendations = async () => {
@@ -230,6 +266,24 @@ function App() {
         </div>
 
         <section className="results-section">
+          {songs && songs.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="action-bar"
+              style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}
+            >
+              <button
+                onClick={startAutoPlay}
+                className="generate-btn"
+                style={{ background: 'var(--accent-secondary)', width: 'auto' }}
+              >
+                <Play size={16} fill="white" />
+                Play All
+              </button>
+            </motion.div>
+          )}
+
           <AnimatePresence>
             {songs && songs.map((song, index) => (
               <motion.div
@@ -246,7 +300,10 @@ function App() {
                   </div>
                   <button
                     className="play-btn"
-                    onClick={() => playSong(song)}
+                    onClick={() => {
+                      setIsAutoPlaying(false);
+                      playSong(song, index);
+                    }}
                     title="Play Song"
                   >
                     <Play size={20} fill="currentColor" />
@@ -284,15 +341,28 @@ function App() {
               <button className="close-btn" onClick={closePlayer}>
                 <X size={24} />
               </button>
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${currentVideo}?autoplay=1`}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              ></iframe>
+              <div id="youtube-player" style={{ width: '100%', height: '100%' }}>
+                {/* This div will be replaced by the YouTube IFrame API */}
+                <iframe
+                  id="existing-iframe-player"
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&origin=${window.location.origin}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  onLoad={(e) => {
+                    if (window.YT && window.YT.Player) {
+                      new window.YT.Player(e.target, {
+                        events: {
+                          'onStateChange': handlePlayerStateChange
+                        }
+                      });
+                    }
+                  }}
+                ></iframe>
+              </div>
             </motion.div>
           </motion.div>
         )}
