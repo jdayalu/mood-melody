@@ -176,7 +176,7 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${playing && !audioOnly ? 'video-active' : ''} ${audioOnly ? 'audio-active' : ''}`}>
       <header className="header">
         <div className="logo">
           <Music className="logo-icon" />

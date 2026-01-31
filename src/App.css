@@ -1,3 +1,4 @@
+/* Main App Container Transitions */
 .app-container {
   max-width: 800px;
   margin: 0 auto;
@@ -7,6 +8,94 @@
   align-items: center;
   gap: 3rem;
   width: 100%;
+  transition: max-width 0.4s ease;
+}
+
+/* Split View (Video Active) - Desktop Only */
+@media (min-width: 1024px) {
+  .app-container.video-active {
+    display: grid;
+    grid-template-columns: 1fr 450px;
+    /* Song list | Player */
+    grid-template-areas:
+      "header player"
+      "main player"
+      "footer player";
+    align-items: start;
+    gap: 2rem;
+    max-width: 1200px;
+  }
+
+  .app-container.video-active .header {
+    grid-area: header;
+    margin-top: 0;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .app-container.video-active .logo {
+    justify-content: flex-start;
+  }
+
+  .app-container.video-active .main-content {
+    grid-area: main;
+    max-width: 100%;
+  }
+
+  .app-container.video-active .footer {
+    grid-area: footer;
+  }
+
+  /* Transform Modal into Sidebar Player */
+  .app-container.video-active .player-overlay {
+    grid-area: player;
+    position: sticky;
+    top: 2rem;
+    width: 100%;
+    height: auto;
+    background: none;
+    backdrop-filter: none;
+    z-index: 10;
+    padding: 0;
+    display: block;
+    /* Override flex centering */
+    animation: slideInRight 0.5s ease;
+  }
+
+  .app-container.video-active .player-modal {
+    width: 100%;
+    max-width: 100%;
+    transform: none !important;
+    /* Override Framer Motion initial scale */
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .app-container.video-active .close-btn {
+    display: none;
+    /* Hide close button in split view (optional, or keep it) */
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+.reason {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 0.75rem;
 }
 
 .header {
