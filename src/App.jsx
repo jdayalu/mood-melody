@@ -120,15 +120,13 @@ function App() {
       const prompt = `
       You are an expert musicologist and cultural historian specializing in ${language} music.
       Your task is to curate a highly specific and DIVERSE playlist of 10 songs for a listener who is feeling "${mood}".
-      The selection must strictly adhere to the era/age description: "${era}".
       
       IMPORTANT: This request ID is ${Math.random()}. Ensure this playlist is unique and random compared to previous requests. Do not just pick the most famous songs; include some hidden gems or less obvious choices that fit the criteria perfectly.
 
       ### Selection Criteria:
       1. **Mood Matching:** Analyze the lyrics, tempo, key, and instrumentation. Ensure the emotional resonance matches "${mood}" precisely.
-      2. **Era Accuracy:** Strictly filter for songs released or popular during the "${era}" period.
-      3. **Language:** All songs must be sung in ${language}.
-      4. **Randomness:** Shuffle your internal database selection to provide a varied mix every time this prompt is run.
+      2. **Language:** All songs must be sung in ${language}.
+      3. **Randomness:** Shuffle your internal database selection to provide a varied mix every time this prompt is run.
 
       ### Output Requirements:
       - Return ONLY a raw JSON array.
