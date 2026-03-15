@@ -25,6 +25,8 @@ function App() {
 
 
 
+  const [playlistIds, setPlaylistIds] = useState([]);
+
   // Load YouTube IFrame API
   useState(() => {
     if (!window.YT) {
@@ -36,65 +38,92 @@ function App() {
   }, []);
 
   const playSong = async (song, index = -1) => {
-    // If no API key configured, fallback immediately
     if (!youtubeKey || youtubeKey.includes('your_youtube_api_key')) {
-      window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
+      window.open(`https://music.youtube.com/search?q=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
       return;
     }
 
     setPlaying(true);
+    setPlaylistIds([]); // Clear playlist mode
     if (index !== -1) setCurrentSongIndex(index);
 
     try {
       const query = `${song.title} ${song.artist} official audio`;
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&key=${youtubeKey}`);
+      const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&videoCategoryId=10&key=${youtubeKey}`);
       const data = await response.json();
 
       if (data.error) {
-        console.warn("YouTube API Error (likely quota). Falling back to external link.", data.error);
+        console.warn("YouTube API Error (likely quota).", data.error);
         setPlaying(false);
-        // Fallback: Open in new tab
-        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
+        window.open(`https://music.youtube.com/search?q=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
         return;
       }
 
       if (data.items && data.items.length > 0) {
         setCurrentVideo(data.items[0].id.videoId);
       } else {
-        // Fallback if empty results
         console.warn("No video found, opening fallback.");
         setPlaying(false);
-        window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
+        window.open(`https://music.youtube.com/search?q=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
       }
     } catch (err) {
-      // Fallback on network/other error
       console.error("YouTube Search Error:", err);
       setPlaying(false);
-      window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
+      window.open(`https://music.youtube.com/search?q=${encodeURIComponent(`${song.title} ${song.artist}`)}`, '_blank');
     }
   };
-
-
 
   const closePlayer = () => {
     setPlaying(false);
     setCurrentVideo(null);
+    setPlaylistIds([]);
     setIsAutoPlaying(false);
     setCurrentSongIndex(-1);
   };
 
   const handlePlayerStateChange = (event) => {
     // 0 = ENDED
-    if (event.data === 0 && isAutoPlaying && songs && currentSongIndex !== -1 && currentSongIndex < songs.length - 1) {
+    if (event.data === 0 && isAutoPlaying && songs && currentSongIndex >= 0 && currentSongIndex < songs.length - 1 && playlistIds.length === 0) {
       const nextIndex = currentSongIndex + 1;
       playSong(songs[nextIndex], nextIndex);
     }
   };
 
-  const startAutoPlay = () => {
-    if (songs && songs.length > 0) {
-      setIsAutoPlaying(true);
-      playSong(songs[0], 0);
+  const startAutoPlay = async () => {
+    if (!songs || songs.length === 0) return;
+    setLoading(true);
+    try {
+      if (!youtubeKey || youtubeKey.includes('your_youtube_api_key')) {
+         window.open(`https://music.youtube.com/search?q=${encodeURIComponent(`${songs[0].title} ${songs[0].artist}`)}`, '_blank');
+         return;
+      }
+      
+      const promises = songs.map(async (song) => {
+         const query = `${song.title} ${song.artist} official audio`;
+         const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&videoCategoryId=10&key=${youtubeKey}`);
+         const data = await response.json();
+         if (data.items && data.items.length > 0) {
+            return data.items[0].id.videoId;
+         }
+         return null;
+      });
+      
+      const vIds = (await Promise.all(promises)).filter(id => id !== null);
+
+      if (vIds.length > 0) {
+         setPlaylistIds(vIds);
+         setCurrentVideo(vIds[0]);
+         setIsAutoPlaying(true);
+         setPlaying(true);
+         setCurrentSongIndex(-2); // Flag for multi-track playlist mode
+      } else {
+         setError("No music tracks found.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to generate complete playlist.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -375,7 +404,7 @@ function App() {
                       id="audio-iframe-player"
                       width="100%"
                       height="100%"
-                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&playsinline=1&origin=${window.location.origin}`}
+                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&playsinline=1${playlistIds.length > 0 ? `&playlist=${playlistIds.slice(1).join(',')}` : ''}&origin=${window.location.origin}`}
                       title="YouTube audio player"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -424,7 +453,7 @@ function App() {
                       id="existing-iframe-player"
                       width="100%"
                       height="100%"
-                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&playsinline=1&origin=${window.location.origin}`}
+                      src={`https://www.youtube.com/embed/${currentVideo}?enablejsapi=1&autoplay=1&playsinline=1${playlistIds.length > 0 ? `&playlist=${playlistIds.slice(1).join(',')}` : ''}&origin=${window.location.origin}`}
                       title="YouTube video player"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
