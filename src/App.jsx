@@ -8,6 +8,7 @@ import './PlayButton.css';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [userToken, setUserToken] = useState(null);
   
   const [mood, setMood] = useState('Nostalgic');
   const [language, setLanguage] = useState('Malayalam');
@@ -275,11 +276,6 @@ function App() {
     }
   };
 
-  const loginAndSave = useGoogleLogin({
-    onSuccess: (tokenResponse) => saveToYouTubePlaylist(tokenResponse.access_token),
-    scope: 'https://www.googleapis.com/auth/youtube.force-ssl',
-  });
-
   const performLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -288,10 +284,12 @@ function App() {
         });
         const userInfo = await res.json();
         setUser(userInfo);
+        setUserToken(tokenResponse.access_token);
       } catch (err) {
         console.error(err);
       }
     },
+    scope: 'https://www.googleapis.com/auth/youtube.force-ssl',
   });
 
   if (!user) {
@@ -317,7 +315,7 @@ function App() {
       <header className="header">
         <div style={{ position: 'absolute', top: 20, right: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
             {user.picture && <img src={user.picture} alt="Profile" style={{ width: 32, height: 32, borderRadius: '50%' }} />}
-            <button onClick={() => setUser(null)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>Logout</button>
+            <button onClick={() => { setUser(null); setUserToken(null); }} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>Logout</button>
         </div>
         <div className="logo">
           <Music className="logo-icon" />
@@ -418,8 +416,8 @@ function App() {
               </button>
 
               <button
-                onClick={() => loginAndSave()}
-                disabled={savingPlaylist}
+                onClick={() => saveToYouTubePlaylist(userToken)}
+                disabled={savingPlaylist || !userToken}
                 className="generate-btn"
                 style={{ background: '#FF0000', width: 'auto' }}
               >
