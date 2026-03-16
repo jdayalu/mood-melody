@@ -7,6 +7,8 @@ import './App.css';
 import './PlayButton.css';
 
 function App() {
+  const [user, setUser] = useState(null);
+  
   const [mood, setMood] = useState('Nostalgic');
   const [language, setLanguage] = useState('Malayalam');
 
@@ -278,9 +280,45 @@ function App() {
     scope: 'https://www.googleapis.com/auth/youtube.force-ssl',
   });
 
+  const performLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const userInfo = await res.json();
+        setUser(userInfo);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+  });
+
+  if (!user) {
+    return (
+      <div className="app-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: 'center' }}>
+          <Music size={64} style={{ color: 'var(--accent-primary)', marginBottom: '1rem' }} />
+          <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>SariGama</h1>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.2rem' }}>Sign in to discover your perfect soundtrack.</p>
+          <button onClick={() => performLogin()} className="generate-btn" style={{ margin: '0 auto', fontSize: '1.1rem', padding: '1rem 2rem' }}>
+            <svg style={{ width: 24, height: 24, marginRight: 10 }} viewBox="0 0 24 24">
+              <path fill="currentColor" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.2,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.1,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.36,22 12.22,22C17.05,22 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1V11.1Z" />
+            </svg>
+            Sign in with Google
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className={`app-container ${playing && !audioOnly ? 'video-active' : ''} ${audioOnly ? 'audio-active' : ''}`}>
       <header className="header">
+        <div style={{ position: 'absolute', top: 20, right: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+            {user.picture && <img src={user.picture} alt="Profile" style={{ width: 32, height: 32, borderRadius: '50%' }} />}
+            <button onClick={() => setUser(null)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>Logout</button>
+        </div>
         <div className="logo">
           <Music className="logo-icon" />
           <h1>SariGama</h1>
