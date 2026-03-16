@@ -247,9 +247,9 @@ function App() {
           vIds = (await Promise.all(promises)).filter(id => id !== null);
       }
 
-      // 3. Add to playlist
-      const addPromises = vIds.map(videoId => {
-        return fetch('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet', {
+      // 3. Add to playlist sequentially to avoid API conflicts
+      for (const videoId of vIds) {
+        await fetch('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -265,8 +265,7 @@ function App() {
             }
           })
         });
-      });
-      await Promise.all(addPromises);
+      }
       alert('Playlist successfully saved to YouTube Music!');
     } catch (err) {
       console.error(err);
