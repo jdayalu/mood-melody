@@ -235,16 +235,16 @@ function App() {
       if (createData.error) throw new Error(createData.error.message);
       const playlistId = createData.id;
 
-      let vIds = playlistIds; 
-      if (vIds.length === 0) {
-          const promises = songs.map(async (song) => {
-             const query = `${song.title} ${song.artist} official audio`;
-             const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&videoCategoryId=10&key=${youtubeKey}`);
-             const data = await response.json();
-             if (data.items && data.items.length > 0) return data.items[0].id.videoId;
-             return null;
-          });
-          vIds = (await Promise.all(promises)).filter(id => id !== null);
+      let vIds = [];
+      for (const song of songs) {
+        try {
+          const query = `${song.title} ${song.artist} official audio`;
+          const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${encodeURIComponent(query)}&type=video&videoCategoryId=10&key=${youtubeKey}`);
+          const data = await response.json();
+          if (data.items && data.items.length > 0) {
+            vIds.push(data.items[0].id.videoId);
+          }
+        } catch(e) { console.error('Error finding song', song.title, e); }
       }
 
       // 3. Add to playlist sequentially to avoid API conflicts
@@ -265,6 +265,8 @@ function App() {
             }
           })
         });
+        // Wait briefly to prevent YouTube rate-limiting write operations
+        await new Promise(res => setTimeout(res, 500));
       }
       alert('Playlist successfully saved to YouTube Music!');
     } catch (err) {
